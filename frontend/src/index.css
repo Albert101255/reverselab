@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Ghidra Classic Dark Backgrounds ── */
+  --color-dark-950: #141619;
+  --color-dark-900: #181a1f;
+  --color-dark-800: #21252b;
+  --color-dark-700: #282c34;
+  --color-dark-600: #31353f;
+  --color-dark-500: #424754;
+
+  /* ── Ghidra UI Accents ── */
+  --color-accent-cyan:    #4fc1ff;
+  --color-accent-blue:    #007acc;
+  --color-accent-emerald: #4ec9b0;
+  --color-accent-purple:  #c586c0;
+  --color-accent-gold:    #e5c07b;
+  --color-accent-danger:  #f44747;
+
+  /* ── Code Syntax Colors (Ghidra CodeBrowser) ── */
+  --color-code-addr:    #7ec8a0;
+  --color-code-mnem:    #dcdcaa;
+  --color-code-oper:    #9cdcfe;
+  --color-code-str:     #ce9178;
+  --color-code-num:     #b5cea8;
+  --color-code-comment: #6a9955;
+  --color-code-label:   #c586c0;
+  --color-code-func:    #4fc1ff;
+
+  /* ── Selection States ── */
+  --color-sel-bg:    #094771;
+  --color-sel-hover: #2c313a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #181a1f;
+  color: #abb2bf;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 12px;
+  overflow: hidden;
+}
+
+/* Monospace base for code blocks */
+.mono { font-family: 'Consolas', 'Cascadia Code', 'JetBrains Mono', 'Source Code Pro', monospace; }
+
+/* Thin scrollbars */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #181a1f; }
+::-webkit-scrollbar-thumb { background: #3c404b; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #5c6370; }
+
+/* Flat table defaults */
+table { border-collapse: collapse; width: 100%; }
+th    { text-align: left; font-weight: 600; color: #858585; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Selection highlight */
+::selection { background: #094771; color: #ffffff; }
+
+.ghidra-btn {
+  @apply px-2.5 py-1 bg-dark-700 hover:bg-sel-hover border border-dark-600 rounded-sm text-[11px] font-mono text-[#abb2bf] flex items-center gap-1.5 transition-colors cursor-pointer select-none;
+}
