@@ -63,6 +63,7 @@ class DecompilerEngine:
                     stack_vars[offset_str] = {
                         "name": v_name,
                         "offset": offset_str,
+                        "expr": stack_match.group(0),
                         "type": "int32_t" if "4" in offset_str or "8" in offset_str else "uint64_t",
                         "size": 4,
                     }
@@ -96,11 +97,9 @@ class DecompilerEngine:
             pseudocode_lines.append("")
 
         # High-level control flow reconstruction
-        in_if_block = False
         for i, inst in enumerate(instructions):
             mnem = inst.get("mnemonic", "").lower()
             ops = inst.get("operands", "")
-            addr = inst.get("address", "")
 
             # Translate assembly statements into C AST constructs
             if mnem == "mov" or mnem == "movzx":
@@ -109,8 +108,9 @@ class DecompilerEngine:
                     dst, src = parts[0], parts[1]
                     # Replace raw stack references with variable names
                     for offset_str, v in stack_vars.items():
-                        src = src.replace(f"[{stack_match.group(1)}{offset_str}]" if stack_match else offset_str, v['name'])
-                        dst = dst.replace(f"[{stack_match.group(1)}{offset_str}]" if stack_match else offset_str, v['name'])
+                        expr = v.get("expr", offset_str)
+                        src = src.replace(expr, v['name'])
+                        dst = dst.replace(expr, v['name'])
                     pseudocode_lines.append(f"    {dst} = {src};")
             elif mnem in ["add", "sub", "xor", "or", "and", "shl", "shr"]:
                 parts = [p.strip() for p in ops.split(",")]

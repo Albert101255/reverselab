@@ -4,11 +4,20 @@ __pycache__/
 *$py.class
 *.so
 .Python
-backend/venv/
-backend/env/
+venv/
+.venv/
+env/
 ENV/
+backend/venv/
+backend/.venv/
+backend/env/
+.pytest_cache/
+backend/.pytest_cache/
 
 # Node & Frontend
+node_modules/
+dist/
+dist-ssr/
 frontend/node_modules/
 frontend/dist/
 frontend/dist-ssr/

@@ -1,11 +1,17 @@
-import lief
+try:
+    import lief
+    LIEF_AVAILABLE = True
+except ImportError:
+    lief = None
+    LIEF_AVAILABLE = False
+
 from app.parsers.base_parser import BaseParser
 from app.detectors.file_detector import FileDetector
 from app.analysis.disassembler import DisassemblerEngine
 
 class PEParser(BaseParser):
     def parse(self, file_bytes: bytes, filename: str) -> dict:
-        pe = lief.PE.parse(list(file_bytes))
+        pe = lief.PE.parse(list(file_bytes)) if LIEF_AVAILABLE else None
         
         headers = []
         sections = []

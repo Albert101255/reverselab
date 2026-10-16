@@ -30,7 +30,7 @@ export function App() {
         try {
           const errData = await response.json();
           if (errData.detail) detailMsg = errData.detail;
-        } catch (_) {}
+        } catch {}
         throw new Error(detailMsg);
       }
 

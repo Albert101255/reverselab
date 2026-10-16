@@ -54,17 +54,20 @@ export function DecompilerPanel({ filename, fileId, functions = [], activeFile }
   const [selectedFnName, setSelectedFnName] = useState<string>('main');
   const [viewMode, setViewMode] = useState<'pseudocode' | 'pcode' | 'variables' | 'heuristics'>('pseudocode');
   const [decompData, setDecompData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadedKey, setLoadedKey] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [varRenames, setVarRenames] = useState<Record<string, string>>({});
   const [renameTarget, setRenameTarget] = useState<string | null>(null);
   const [newVarName, setNewVarName] = useState('');
   const taRef = useRef<HTMLDivElement>(null);
 
+  const currentKey = fileId ? `${fileId}:${selectedFnName}` : '';
+  const loading = Boolean(fileId && loadedKey !== currentKey);
+
   // Fetch decompilation from backend engine when function or file changes
   useEffect(() => {
     if (!fileId) return;
-    setLoading(true);
+    const key = `${fileId}:${selectedFnName}`;
     fetch(`${API_BASE_URL}/api/files/decompile`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -75,7 +78,7 @@ export function DecompilerPanel({ filename, fileId, functions = [], activeFile }
         setDecompData(data);
       })
       .catch(err => console.error('Decompilation error:', err))
-      .finally(() => setLoading(false));
+      .finally(() => setLoadedKey(key));
   }, [fileId, selectedFnName]);
 
   const defaultTitle = filename ? `${filename}::${selectedFnName}` : 'main.c';

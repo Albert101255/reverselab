@@ -27,8 +27,8 @@
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React 18, TypeScript, Vite, Vanilla CSS + TailwindCSS (Ghidra Dark Slate Workstation Palette).
-- **Backend**: FastAPI, Python 3.14, Uvicorn, PEFile, PyELFTools, Capstone.
+- **Frontend**: React 19, TypeScript, Vite, Vanilla CSS + TailwindCSS (Ghidra Dark Slate Workstation Palette).
+- **Backend**: FastAPI, Python 3.10+, Uvicorn, LIEF, Capstone.
 
 ---
 
@@ -62,7 +62,7 @@ npm run dev
 To verify all backend endpoints, decompilation engine, hex patching, and script execution:
 ```bash
 cd backend
-source venv/bin/activate
+pytest -v
 python test_api_qa.py
 ```
 

@@ -48,24 +48,27 @@ export function Workspace({ analysis, onNewFile }: WorkspaceProps) {
   const [bottomDrawer, setBottomDrawer]               = useState<'console' | 'inspector' | null>('console');
   const [selectedOffset, setSelectedOffset]           = useState<number>(0);
   const [isSearchOpen, setIsSearchOpen]               = useState(false);
-  const [bookmarks, setBookmarks]                     = useState<BookmarkItem[]>([
-    {
-      id: 'bm-1',
-      address: '0x401000',
-      category: 'Analysis',
-      comment: 'Primary entry point main routine',
-      author: 'Ghidra Engine',
-      timestamp: new Date().toLocaleTimeString(),
-    },
-    {
-      id: 'bm-2',
-      address: '0x401050',
-      category: 'Vulnerability',
-      comment: 'Unbounded strcpy buffer copy detected',
-      author: 'Security Analyzer',
-      timestamp: new Date().toLocaleTimeString(),
-    }
-  ]);
+  const [bookmarks, setBookmarks]                     = useState<BookmarkItem[]>(() => {
+    const now = new Date().toLocaleTimeString();
+    return [
+      {
+        id: 'bm-1',
+        address: '0x401000',
+        category: 'Analysis',
+        comment: 'Primary entry point main routine',
+        author: 'Ghidra Engine',
+        timestamp: now,
+      },
+      {
+        id: 'bm-2',
+        address: '0x401050',
+        category: 'Vulnerability',
+        comment: 'Unbounded strcpy buffer copy detected',
+        author: 'Security Analyzer',
+        timestamp: now,
+      }
+    ];
+  });
 
   const handleFunctionClick = (fn: FunctionItem) => {
     setSelectedFn(fn);
