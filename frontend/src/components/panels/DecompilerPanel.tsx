@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { DecompiledFile, FunctionItem } from '../../types/analysis';
-import { API_BASE_URL } from '../../api';
+import { decompileFunction } from '../../api';
+import type { DecompilationResult } from '../../api';
 
 interface DecompilerPanelProps {
   filename: string;
@@ -13,7 +14,7 @@ const KEYWORDS = new Set([
   'void','int','char','if','else','return','exit','for','while','do','struct','typedef',
   'unsigned','long','short','static','const','NULL','true','false','mmap','munmap','open',
   'close','fprintf','perror','import','package','class','public','private','protected',
-  'final','extends','implements','new','try','catch','int32_t','uint64_t','goto','COPY',
+  'final','extends','implements','new','try','catch','int32_t','uint64_t','uint8_t','size_t','goto','COPY',
   'INT_ADD','INT_SUB','INT_XOR','INT_EQUAL','CALL','RETURN','BRANCH'
 ]);
 
@@ -53,7 +54,7 @@ function tokenize(line: string): React.ReactNode[] {
 export function DecompilerPanel({ filename, fileId, functions = [], activeFile }: DecompilerPanelProps) {
   const [selectedFnName, setSelectedFnName] = useState<string>('main');
   const [viewMode, setViewMode] = useState<'pseudocode' | 'pcode' | 'variables' | 'heuristics'>('pseudocode');
-  const [decompData, setDecompData] = useState<any>(null);
+  const [decompData, setDecompData] = useState<DecompilationResult | null>(null);
   const [loadedKey, setLoadedKey] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [varRenames, setVarRenames] = useState<Record<string, string>>({});
@@ -64,16 +65,11 @@ export function DecompilerPanel({ filename, fileId, functions = [], activeFile }
   const currentKey = fileId ? `${fileId}:${selectedFnName}` : '';
   const loading = Boolean(fileId && loadedKey !== currentKey);
 
-  // Fetch decompilation from backend engine when function or file changes
+  // Fetch decompilation from backend engine (or client-side fallback) when function or file changes
   useEffect(() => {
     if (!fileId) return;
     const key = `${fileId}:${selectedFnName}`;
-    fetch(`${API_BASE_URL}/api/files/decompile`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ file_id: fileId, function_name: selectedFnName }),
-    })
-      .then(res => res.json())
+    decompileFunction(fileId, selectedFnName)
       .then(data => {
         setDecompData(data);
       })
@@ -205,8 +201,8 @@ export function DecompilerPanel({ filename, fileId, functions = [], activeFile }
             <div className="text-[11px] text-[#858585] mb-2 font-bold uppercase tracking-wider">
               Ghidra P-Code Intermediate Representation (IR)
             </div>
-            {decompData?.pcode_ir?.length > 0 ? (
-              decompData.pcode_ir.map((p: any, idx: number) => (
+            {decompData && decompData.pcode_ir.length > 0 ? (
+              decompData.pcode_ir.map((p, idx: number) => (
                 <div key={idx} className="flex items-center gap-4 py-1 border-b border-dark-800 hover:bg-sel-hover px-2 rounded">
                   <span className="text-[#7ec8a0] w-24 shrink-0">{p.address}</span>
                   <span className="text-[#c586c0] w-16 shrink-0 font-bold">{p.mnemonic}</span>
@@ -237,8 +233,8 @@ export function DecompilerPanel({ filename, fileId, functions = [], activeFile }
                 </tr>
               </thead>
               <tbody>
-                {decompData?.stack_variables?.length > 0 ? (
-                  decompData.stack_variables.map((v: any) => {
+                {decompData && decompData.stack_variables.length > 0 ? (
+                  decompData.stack_variables.map((v) => {
                     const currentName = varRenames[v.name] || v.name;
                     return (
                       <tr key={v.offset} className="border-b border-dark-700 hover:bg-sel-hover">
@@ -272,9 +268,9 @@ export function DecompilerPanel({ filename, fileId, functions = [], activeFile }
             <div className="text-[12px] font-bold text-[#f44747] mb-3">
               Decompiled Security & API Threat Heuristics
             </div>
-            {decompData?.security_heuristics?.length > 0 ? (
+            {decompData && decompData.security_heuristics.length > 0 ? (
               <div className="space-y-2">
-                {decompData.security_heuristics.map((h: any, idx: number) => (
+                {decompData.security_heuristics.map((h, idx: number) => (
                   <div key={idx} className="bg-dark-800 border border border-dark-600 rounded p-3 flex items-center justify-between">
                     <div>
                       <div className="text-[#9cdcfe] font-bold">{h.api}()</div>

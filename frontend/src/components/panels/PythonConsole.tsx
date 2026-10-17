@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { API_BASE_URL } from '../../api';
+import { executePythonScript } from '../../api';
 
 interface PythonConsoleProps {
   fileId: string;
@@ -33,13 +33,8 @@ export function PythonConsole({ fileId }: PythonConsoleProps) {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/files/exec`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ file_id: fileId, code }),
-      });
-      const data = await res.json();
-      setHistory(prev => [...prev, { type: 'out', text: data.output || 'Done.' }]);
+      const output = await executePythonScript(fileId, code);
+      setHistory(prev => [...prev, { type: 'out', text: output }]);
     } catch (err) {
       setHistory(prev => [...prev, { type: 'err', text: `Execution failed: ${err}` }]);
     } finally {

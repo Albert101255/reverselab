@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { API_BASE_URL } from '../../api';
+import { patchBinaryBytes } from '../../api';
 
 interface HexInspectorProps {
   fileId: string;
   selectedByteOffset: number;
   rawHex: string;
-  onPatchSuccess?: () => void;
+  onPatchSuccess?: (updatedHex?: string) => void;
 }
 
 export function HexInspector({ fileId, selectedByteOffset, rawHex, onPatchSuccess }: HexInspectorProps) {
@@ -26,21 +26,12 @@ export function HexInspector({ fileId, selectedByteOffset, rawHex, onPatchSucces
     setPatching(true);
     setPatchMsg('');
     try {
-      const res = await fetch(`${API_BASE_URL}/api/files/patch`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          file_id: fileId,
-          offset: selectedByteOffset,
-          hex_bytes: patchHex,
-        }),
-      });
-      const data = await res.json();
+      const res = await patchBinaryBytes(fileId, selectedByteOffset, patchHex);
       if (res.ok) {
-        setPatchMsg(`Patched ${data.bytes_patched} byte(s) successfully!`);
-        onPatchSuccess?.();
+        setPatchMsg(`Patched ${res.bytesPatched} byte(s) successfully!`);
+        onPatchSuccess?.(res.updatedHex);
       } else {
-        setPatchMsg(`Error: ${data.detail || 'Patch failed'}`);
+        setPatchMsg(`Error: ${res.error || 'Patch failed'}`);
       }
     } catch (err) {
       setPatchMsg(`Patch failed: ${err}`);

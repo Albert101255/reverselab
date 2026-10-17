@@ -9,9 +9,9 @@ export function HomeScreen({ onFileSelected }: HomeScreenProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sampleFiles = [
-    { name: 'target_binary.exe', format: 'PE32+ (x86_64)', size: '6.4 MB', date: 'Today 14:30', type: 'Executable' },
-    { name: 'sample_elf_x64.so', format: 'ELF 64-bit LSB', size: '2.1 MB', date: 'Today 12:15', type: 'Library' },
-    { name: 'app-release.apk', format: 'Android APK (DEX)', size: '18.5 MB', date: 'Yesterday', type: 'Package' },
+    { name: 'crackme_x64.elf', format: 'ELF 64-bit LSB (x86_64)', size: '68.4 KB', date: 'Today 14:30', type: 'Executable' },
+    { name: 'beacon_loader.exe', format: 'PE32+ (x86_64)', size: '145.0 KB', date: 'Today 12:15', type: 'Executable' },
+    { name: 'app-release.apk', format: 'Android APK (DEX)', size: '2.4 MB', date: 'Yesterday', type: 'Package' },
   ];
 
   const handleDrop = (e: React.DragEvent) => {
@@ -29,7 +29,10 @@ export function HomeScreen({ onFileSelected }: HomeScreenProps) {
   };
 
   const createDummyFile = (filename: string) => {
-    const dummyContent = new Uint8Array([0x4d, 0x5a, 0x90, 0x00, 0x03, 0x00, 0x00, 0x00]);
+    const isPE = filename.endsWith('.exe');
+    const dummyContent = isPE
+      ? new Uint8Array([0x4d, 0x5a, 0x90, 0x00, 0x03, 0x00, 0x00, 0x00])
+      : new Uint8Array([0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00]);
     const blob = new Blob([dummyContent], { type: 'application/octet-stream' });
     const file = new File([blob], filename, { type: 'application/octet-stream' });
     onFileSelected(file);
@@ -55,12 +58,18 @@ export function HomeScreen({ onFileSelected }: HomeScreenProps) {
         >
           📂 Import File... (Ins)
         </button>
-        <div className="h-4 w-px bg-dark-600 mx-1" />
-        <button className="px-3 py-1 bg-dark-700 hover:bg-sel-hover border border-dark-600 text-[#abb2bf] rounded-sm">
-          📁 New Folder
+        <button
+          onClick={() => createDummyFile('crackme_x64.elf')}
+          className="px-3 py-1 bg-dark-700 hover:bg-sel-hover border border-accent-blue/60 text-[#4fc1ff] rounded-sm font-semibold cursor-pointer"
+        >
+          🐉 Launch Demo (crackme_x64.elf)
         </button>
-        <button className="px-3 py-1 bg-dark-700 hover:bg-sel-hover border border-dark-600 text-[#abb2bf] rounded-sm">
-          🔍 Search Project
+        <div className="h-4 w-px bg-dark-600 mx-1" />
+        <button
+          onClick={() => createDummyFile('beacon_loader.exe')}
+          className="px-3 py-1 bg-dark-700 hover:bg-sel-hover border border-dark-600 text-[#abb2bf] rounded-sm cursor-pointer"
+        >
+          ⚡ Load PE64 Sample (beacon_loader.exe)
         </button>
         <input
           type="file"
@@ -81,7 +90,10 @@ export function HomeScreen({ onFileSelected }: HomeScreenProps) {
             </div>
 
             {/* CodeBrowser Tool Card */}
-            <div className="bg-dark-700 border border-dark-600 rounded p-3 mb-3 hover:border-accent-blue transition-colors cursor-pointer group">
+            <div
+              onClick={() => createDummyFile('crackme_x64.elf')}
+              className="bg-dark-700 border border-dark-600 rounded p-3 mb-3 hover:border-accent-blue transition-colors cursor-pointer group"
+            >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-dark-900 border border-dark-600 rounded flex items-center justify-center text-xl text-[#4fc1ff] group-hover:scale-110 transition-transform">
                   🐉

@@ -47,6 +47,7 @@ export function Workspace({ analysis, onNewFile }: WorkspaceProps) {
   const [selectedDecompiledFile, setSelectedDecompiledFile] = useState<DecompiledFile | null>(null);
   const [bottomDrawer, setBottomDrawer]               = useState<'console' | 'inspector' | null>('console');
   const [selectedOffset, setSelectedOffset]           = useState<number>(0);
+  const [rawHex, setRawHex]                           = useState<string>(analysis.raw_hex_preview);
   const [isSearchOpen, setIsSearchOpen]               = useState(false);
   const [bookmarks, setBookmarks]                     = useState<BookmarkItem[]>(() => {
     const now = new Date().toLocaleTimeString();
@@ -231,7 +232,7 @@ export function Workspace({ analysis, onNewFile }: WorkspaceProps) {
             {activeTab === 'bookmarks'  && <BookmarksPanel bookmarks={bookmarks} onAddBookmark={handleAddBookmark} onNavigateAddress={handleNavigateAddress} />}
             {activeTab === 'entropy'    && <EntropyVisualizer entropyBlocks={analysis.entropy_blocks} sections={analysis.sections} />}
             {activeTab === 'sections'   && <SectionViewer sections={analysis.sections} />}
-            {activeTab === 'hex'        && <HexViewer rawHex={analysis.raw_hex_preview} onSelectOffset={setSelectedOffset} />}
+            {activeTab === 'hex'        && <HexViewer rawHex={rawHex} onSelectOffset={setSelectedOffset} />}
             {activeTab === 'strings'    && <StringsViewer strings={analysis.strings} />}
             {activeTab === 'symbols'    && <ImportsExportsViewer imports={analysis.imports} exports={analysis.exports} />}
             {activeTab === 'headers'    && <HeaderViewer headers={analysis.headers} />}
@@ -270,7 +271,10 @@ export function Workspace({ analysis, onNewFile }: WorkspaceProps) {
                   <HexInspector
                     fileId={analysis.file_id}
                     selectedByteOffset={selectedOffset}
-                    rawHex={analysis.raw_hex_preview}
+                    rawHex={rawHex}
+                    onPatchSuccess={updatedHex => {
+                      if (updatedHex) setRawHex(updatedHex);
+                    }}
                   />
                 )}
               </div>

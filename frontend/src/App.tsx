@@ -3,7 +3,7 @@ import { HomeScreen } from './components/HomeScreen';
 import { Workspace } from './components/Workspace';
 import { AnalyzingScreen } from './components/AnalyzingScreen';
 import type { AnalysisResult } from './types/analysis';
-import { API_BASE_URL } from './api';
+import { analyzeBinaryFile } from './api';
 
 export function App() {
   const [file, setFile] = useState<File | null>(null);
@@ -16,25 +16,8 @@ export function App() {
     setAnalyzing(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-
     try {
-      const response = await fetch(`${API_BASE_URL}/api/files`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        let detailMsg = `Analysis server error (${response.status})`;
-        try {
-          const errData = await response.json();
-          if (errData.detail) detailMsg = errData.detail;
-        } catch {}
-        throw new Error(detailMsg);
-      }
-
-      const data: AnalysisResult = await response.json();
+      const data = await analyzeBinaryFile(selectedFile);
       setAnalysisResult(data);
     } catch (err: any) {
       console.error(err);

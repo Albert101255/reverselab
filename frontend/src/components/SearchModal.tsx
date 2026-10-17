@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { SearchMatch } from '../types/analysis';
-import { API_BASE_URL } from '../api';
+import { searchBinaryContent } from '../api';
 
 interface SearchModalProps {
   fileId: string;
@@ -21,13 +21,8 @@ export function SearchModal({ fileId, isOpen, onClose, onNavigateAddress }: Sear
     if (!query.trim() || searching) return;
     setSearching(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/files/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ file_id: fileId, query, search_type: searchType }),
-      });
-      const data = await res.json();
-      setResults(data.matches || []);
+      const matches = await searchBinaryContent(fileId, query, searchType);
+      setResults(matches);
     } catch (err) {
       console.error('Search error:', err);
     } finally {
